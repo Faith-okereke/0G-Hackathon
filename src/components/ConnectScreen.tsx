@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Cpu, Database, Wallet, ArrowRight, X, Sparkles, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { AegisLogo } from './AegisLogo';
 
 interface ConnectScreenProps {
   onConnect: (walletAddress: string) => void;
@@ -91,12 +92,8 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
         {/* Card Header */}
         <div className="px-6 py-4 border-b border-[#141414] bg-[#EEECE8] flex items-center justify-between">
           <div className="flex items-center gap-3 select-none group">
-            <div className="relative w-8 h-8 flex items-center justify-center">
-              {/* Spinning geometric outline */}
-              <div className="absolute inset-0 rounded-full border border-dashed border-[#141414] group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
-              <div className="absolute inset-1 rounded-full bg-[#141414] flex items-center justify-center">
-                <span className="text-white text-[11px] font-sans font-black italic">Æ</span>
-              </div>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <AegisLogo size={32} />
             </div>
             <span className="font-serif italic text-sm font-semibold tracking-tight text-[#141414]">Ægis Zero Link</span>
           </div>
@@ -105,10 +102,9 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
 
         <div className="p-6">
           <div className="flex flex-col items-center text-center">
-            {/* Display Shield */}
-            <div className="w-12 h-12 bg-[#EEECE8] border border-[#141414] rounded-full flex items-center justify-center mb-4 relative overflow-hidden group">
-              <div className="absolute inset-0 border border-dashed border-[#141414]/30 rounded-full animate-[spin_15s_linear_infinite]" />
-              <Cpu className="w-5 h-5 text-[#141414] z-10" />
+            {/* Display Shield (Brand Logo) */}
+            <div className="w-20 h-20 mb-4 flex items-center justify-center filter drop-shadow-md">
+              <AegisLogo size={80} />
             </div>
 
             <h1 className="text-xl font-mono uppercase font-bold text-[#141414] tracking-tight mb-2">

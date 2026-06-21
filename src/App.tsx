@@ -9,6 +9,7 @@ import { OnboardingWizard } from './components/OnboardingWizard';
 import { Dashboard } from './components/Dashboard';
 import { DecisionLogPage } from './components/DecisionLogPage';
 import { SettingsPage } from './components/SettingsPage';
+import { AegisLogo } from './components/AegisLogo';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { DeFiPosition, DecisionLog, PerformancePoint, VaultLimits } from './types';
 
@@ -310,13 +311,8 @@ export default function App() {
         <div className="flex flex-wrap items-center justify-between md:justify-start gap-4 md:gap-6">
           {/* Logo Name */}
           <div className="flex items-center gap-3 cursor-pointer select-none group" onClick={() => setCurrentTab('dashboard')}>
-            <div className="relative w-9 h-9 flex items-center justify-center">
-              {/* Outer rotating geometric portal */}
-              <div className="absolute inset-0 rounded-full border border-dashed border-[#141414] group-hover:rotate-180 transition-transform duration-700 ease-in-out" />
-              {/* Core shield/vault badge */}
-              <div className="absolute inset-1.5 rounded-full bg-[#141414] flex items-center justify-center shadow-md">
-                <span className="text-[#E4E3E0] text-[11px] font-sans font-black italic tracking-tighter">Æ</span>
-              </div>
+            <div className="w-9 h-9 flex items-center justify-center filter drop-shadow">
+              <AegisLogo size={36} />
             </div>
             <div className="flex flex-col">
               <span className="font-serif italic text-sm sm:text-[15px] font-semibold text-[#141414] leading-none mb-0.5">Ægis Zero</span>
