@@ -193,28 +193,28 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
                   <button
                     onClick={handleMetaMaskConnect}
                     disabled={isConnecting}
-                    className="w-full h-11 bg-[#EEECE8] border border-[#141414] hover:bg-white px-4 text-left flex items-center justify-between group transition-all text-xs font-mono text-[#141414] cursor-pointer"
+                    className="w-full h-11 bg-[#141414] hover:bg-[#2B2B2B] active:scale-[0.99] border border-[#141414] disabled:opacity-50 disabled:pointer-events-none px-4 text-left flex items-center justify-between group transition-all text-xs font-mono text-white cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 flex-shrink-0 bg-orange-100 border border-orange-300 flex items-center justify-center font-bold text-xs">🦊</div>
-                      <span>Metamask Extension</span>
+                      <div className="w-6 h-6 flex-shrink-0 bg-orange-100 border border-orange-300 flex items-center justify-center font-bold text-xs rounded">🦊</div>
+                      <span className="font-bold">Metamask Extension</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {hasMetaMask && <span className="text-[9px] bg-green-200 text-green-800 px-1 py-0.5">Detected</span>}
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <div className="flex items-center gap-1.5">
+                      {hasMetaMask && <span className="text-[9px] bg-green-600 text-white px-1.5 py-0.5 font-sans font-bold uppercase tracking-wide">Detected</span>}
+                      <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                     </div>
                   </button>
 
                   <button
                     onClick={() => handleConnectSimulated("0x71C7656EC7ab88b098defB751B7401B5f6d1476B")}
                     disabled={isConnecting}
-                    className="w-full h-11 bg-[#EEECE8] border border-[#141414] hover:bg-white px-4 text-left flex items-center justify-between group transition-all text-xs font-mono text-[#141414] cursor-pointer"
+                    className="w-full h-11 bg-[#141414] hover:bg-[#2B2B2B] active:scale-[0.99] border border-[#141414] disabled:opacity-50 disabled:pointer-events-none px-4 text-left flex items-center justify-between group transition-all text-xs font-mono text-white cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 flex-shrink-0 bg-blue-100 border border-blue-300 flex items-center justify-center font-bold text-xs">🛡️</div>
-                      <span>Simulated 0G Ledger Wallet</span>
+                      <div className="w-6 h-6 flex-shrink-0 bg-blue-100 border border-blue-300 flex items-center justify-center font-bold text-xs rounded">🛡️</div>
+                      <span className="font-bold">Simulated 0G Ledger Wallet</span>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
 
@@ -231,12 +231,12 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
                         value={customAddress}
                         onChange={(e) => setCustomAddress(e.target.value)}
                         disabled={isConnecting}
-                        className="flex-1 text-xs font-mono h-10 px-3 border border-[#141414] bg-[#EEECE8] placeholder-[#141414]/40"
+                        className="flex-1 text-xs font-mono h-10 px-3 border border-[#141414] bg-white text-[#141414] placeholder-[#141414]/50 outline-none focus:ring-1 focus:ring-[#141414]"
                       />
                       <button
                         type="submit"
                         disabled={isConnecting || !customAddress}
-                        className="px-4 h-10 bg-[#141414] hover:bg-[#2B2B2B] disabled:bg-[#141414]/30 text-white hover:text-white text-xs font-mono uppercase tracking-wider flex items-center justify-center cursor-pointer transition-colors"
+                        className="px-4 h-10 bg-[#141414] hover:bg-[#2B2B2B] disabled:bg-[#141414]/15 disabled:text-[#141414]/40 disabled:border-[#141414]/10 disabled:cursor-not-allowed border border-[#141414] text-white hover:text-white text-xs font-mono uppercase tracking-wider flex items-center justify-center cursor-pointer transition-colors"
                       >
                         Connect
                       </button>
@@ -248,14 +248,14 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
                       <button
                         type="button"
                         onClick={() => handleEasyInput("0x9cE41Ac5718aEA6EBA1b88e0797435f3b79da93C")}
-                        className="text-[9px] font-mono px-2 py-0.5 border border-[#141414]/20 hover:border-[#141414] bg-[#EEECE8] text-[#141414]/80 text-left hover:text-[#141414] cursor-pointer"
+                        className="text-[9px] font-mono px-2 py-0.5 border border-[#141414]/30 hover:border-[#141414] hover:bg-[#EEECE8] bg-[#EEECE8] text-[#141414] font-bold text-left cursor-pointer transition-colors"
                       >
                         0x9cE4...a93C
                       </button>
                       <button
                         type="button"
                         onClick={() => handleEasyInput("0xF1A51197ea8aEB098defB51B5d1A00CAbA1A76Bd")}
-                        className="text-[9px] font-mono px-2 py-0.5 border border-[#141414]/20 hover:border-[#141414] bg-[#EEECE8] text-[#141414]/80 text-left hover:text-[#141414] cursor-pointer"
+                        className="text-[9px] font-mono px-2 py-0.5 border border-[#141414]/30 hover:border-[#141414] hover:bg-[#EEECE8] bg-[#EEECE8] text-[#141414] font-bold text-left cursor-pointer transition-colors"
                       >
                         0xF1A5...76Bd
                       </button>

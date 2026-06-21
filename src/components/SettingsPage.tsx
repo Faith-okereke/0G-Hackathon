@@ -324,13 +324,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               <div className="flex gap-3 justify-end mt-8">
                 <button
                   onClick={() => setShowLimitsModal(false)}
-                  className="px-4 py-2 border border-[#141414] text-[#141414] hover:bg-[#EEECE8] text-xs font-bold uppercase tracking-wider cursor-pointer transition-colors"
+                  className="px-4 py-2 border border-border text-slate-300 hover:bg-white/10 hover:text-white text-xs font-bold uppercase tracking-wider cursor-pointer transition-all duration-150 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveLimits}
-                  className="px-4 py-2 bg-[#141414] hover:bg-[#2B2B2B] text-white hover:text-white text-xs font-bold uppercase tracking-wider border border-[#141414] cursor-pointer transition-colors"
+                  className="px-4 py-2 bg-[#141414] hover:bg-[#2B2B2B] text-white hover:text-white text-xs font-bold uppercase tracking-wider border border-border cursor-pointer transition-all duration-150 rounded"
                 >
                   Apply & Transact limits
                 </button>

@@ -151,6 +151,14 @@ async function startServer() {
   app.use(express.json());
 
   // API Endpoints
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "ok",
+      message: "Aegis Zero background engine is running perfectly!",
+      serverTime: new Date().toISOString()
+    });
+  });
+
   app.get("/api/agent-state", (req, res) => {
     res.json({
       vaultDeployed: !!vaultAddress,
@@ -406,8 +414,9 @@ async function startServer() {
     });
   }
 
-  app.listen(3000, "0.0.0.0", () => {
-    console.log("Server running on port 3000");
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
   });
 }
 
