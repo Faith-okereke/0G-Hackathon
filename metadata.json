@@ -1,0 +1,6 @@
+{
+  "name": "Aegis Zero",
+  "description": "Autonomous, Verifiable, and User-Owned DeFi Portfolio Management built on 0G (Zero Gravity).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

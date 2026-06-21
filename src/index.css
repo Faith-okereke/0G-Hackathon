@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@1,400;1,600;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #E4E3E0;        /* Warm light page background */
+  --color-surface: #D9D8D5;     /* Sidebar & component secondary cards */
+  --color-border: #141414;      /* Strong solid high-density borders */
+  --color-blue: #141414;        /* Monochromatic dark blue/primary solid */
+  --color-green: #16A34A;
+  --color-amber: #D97706;
+  --color-red: #DC2626;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    background-color: #E4E3E0 !important;
+    color: #141414 !important;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Force light-theme styling on high density elements */
+  h1, h2, h3, h4, h5, h6 {
+    color: #141414 !important;
+  }
+
+  /* Structural borders and flat corners */
+  div, button, input, select, textarea, span, table, th, td, key-val, section, header, aside, footer {
+    border-color: #141414 !important;
+    border-radius: 0px !important; /* Flat high-density brutalist style */
+  }
+
+  /* Convert slate text elements to dark contrasting tones */
+  .text-slate-100 { color: #141414 !important; }
+  .text-slate-200 { color: #1C1C1C !important; }
+  .text-slate-300 { color: #2B2B2B !important; }
+  .text-slate-400 { color: #4A4A4A !important; }
+  .text-slate-500 { color: #5C5C5C !important; }
+  .text-slate-600 { color: #6E6E6E !important; }
+  
+  /* Text white override: if inside solid black background elements (like .bg-blue),
+     text-white must be light! Otherwise if it's general, text-white should be dark or off-white. */
+  .text-white {
+    /* color: #141414 !important; */
+  }
+  
+  /* On light/mid gray backgrounds, text-white should be near-black, EXCEPT on solid dark buttons or elements! */
+  .bg-navy .text-white:not([class*="bg-[#141414]"]):not([class*="bg-[#2B2B2B]"]):not(.bg-\[\#141414\]):not(.bg-\[\#2B2B2B\]):not(button.text-white):not(button *), 
+  .bg-surface .text-white:not([class*="bg-[#141414]"]):not([class*="bg-[#2B2B2B]"]):not(.bg-\[\#141414\]):not(.bg-\[\#2B2B2B\]):not(button.text-white):not(button *),
+  p.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  h1.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  h2.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  h3.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  h4.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  h5.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *),
+  span.text-white:not([class*="bg-[#141414]"] *):not([class*="bg-[#2B2B2B]"] *):not(.bg-\[\#141414\] *):not(.bg-\[\#2B2B2B\] *):not(button *) {
+    color: #141414 !important;
+  }
+
+  /* On solid black/blue/green/red elements, text-white must remain light! */
+  button.bg-\[\#141414\],
+  button.bg-\[\#141414\] *,
+  button.bg-\[\#2B2B2B\],
+  button.bg-\[\#2B2B2B\] *,
+  button[class*="bg-[#141414]"],
+  button[class*="bg-[#141414]"] *,
+  button[class*="bg-[#2B2B2B]"],
+  button[class*="bg-[#2B2B2B]"] *,
+  button[class*="bg-blue"],
+  button[class*="bg-blue"] *,
+  .bg-navy [class*="bg-[#141414]"] .text-white,
+  .bg-navy [class*="bg-[#141414]"] [class*="text-white"],
+  .bg-navy [class*="bg-[#141414]"] *,
+  .bg-navy [class*="bg-[#2B2B2B]"] .text-white,
+  .bg-navy [class*="bg-[#2B2B2B]"] [class*="text-white"],
+  .bg-navy [class*="bg-[#2B2B2B]"] *,
+  .bg-surface [class*="bg-[#141414]"] .text-white,
+  .bg-surface [class*="bg-[#141414]"] [class*="text-white"],
+  .bg-surface [class*="bg-[#141414]"] *,
+  .bg-surface [class*="bg-[#2B2B2B]"] .text-white,
+  .bg-surface [class*="bg-[#2B2B2B]"] [class*="text-white"],
+  .bg-surface [class*="bg-[#2B2B2B]"] *,
+  [class*="bg-[#141414]"] [class*="text-white"],
+  [class*="bg-[#141414]"] .text-white,
+  [class*="bg-[#141414]"] *,
+  [class*="bg-[#2B2B2B]"] [class*="text-white"],
+  [class*="bg-[#2B2B2B]"] .text-white,
+  [class*="bg-[#2B2B2B]"] *,
+  .bg-\[\#141414\],
+  .bg-\[\#141414\] *,
+  .bg-\[\#2B2B2B\],
+  .bg-\[\#2B2B2B\] *,
+  [class*="bg-[#141414]"],
+  [class*="bg-[#2B2B2B]"],
+  button.bg-blue,
+  button.bg-blue *,
+  .bg-navy button.bg-blue,
+  .bg-navy button.bg-blue *,
+  .bg-navy .bg-blue .text-white,
+  .bg-navy .bg-blue *,
+  .bg-surface button.bg-blue,
+  .bg-surface button.bg-blue *,
+  .bg-surface .bg-blue .text-white,
+  .bg-surface .bg-blue *,
+  div.bg-blue,
+  div.bg-blue *,
+  span.bg-blue,
+  span.bg-blue *,
+  .bg-blue .text-white,
+  .bg-green-500 .text-white,
+  .bg-red-500 .text-white,
+  .bg-amber-500 .text-white,
+  .bg-red .text-white,
+  .bg-green .text-white,
+  .hover\:bg-\[\#2B2B2B\]:hover,
+  .hover\:bg-\[\#2B2B2B\]:hover * {
+    color: #ffffff !important;
+  }
+
+  /* Fix for Lucide Icons Color */
+  .text-blue, svg.text-blue {
+    color: #141414 !important;
+  }
+  .text-slate-400 svg {
+    color: #4A4A4A !important;
+  }
+
+  /* Form inputs */
+  input, select, textarea {
+    background-color: #EEECE8 !important;
+    color: #141414 !important;
+    border: 1px solid #141414 !important;
+    padding: 0.5rem !important;
+  }
+  input::placeholder {
+    color: #737373 !important;
+  }
+
+  /* Table borders & high-density layout */
+  table {
+    border-collapse: collapse !important;
+    font-size: 11px !important;
+  }
+  th {
+    background-color: #D9D8D5 !important;
+    color: #141414 !important;
+    font-family: var(--font-mono) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-bottom: 2px solid #141414 !important;
+    border-right: 1px solid #141414 !important;
+  }
+  th:last-child {
+    border-right: none !important;
+  }
+  td {
+    border-bottom: 1px solid #141414 !important;
+    border-right: 1px solid #141414 !important;
+    color: #141414 !important;
+  }
+  td:last-child {
+    border-right: none !important;
+  }
+  
+  /* Brutalist high-density table hover inversion disabled to remove hover states from table rows */
+
+  /* Recharts Minimalist Brutalist Dashboard Chart Override */
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: #141414 !important;
+    stroke-opacity: 0.25 !important;
+    stroke-dasharray: 2 2 !important;
+  }
+  .recharts-text {
+    fill: #141414 !important;
+    font-family: var(--font-mono) !important;
+    font-size: 9px !important;
+  }
+  .recharts-area-area {
+    fill: #141414 !important;
+    fill-opacity: 0.1 !important;
+  }
+  .recharts-area-curve {
+    stroke: #141414 !important;
+    stroke-width: 2px !important;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* Animations and transitions */
+.pulse-green {
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}
+
+/* Custom flat scrollbar styling on all screen sizes */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #E4E3E0;
+}
+
+::-webkit-scrollbar-track:vertical {
+  border-left: 1px solid #141414;
+}
+
+::-webkit-scrollbar-track:horizontal {
+  border-top: 1px solid #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #141414;
+  border-radius: 0px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2B2B2B;
+}
+
+::-webkit-scrollbar-corner {
+  background: #E4E3E0;
+  border-top: 1px solid #141414;
+  border-left: 1px solid #141414;
+}
+
+/* Firefox custom scrollbar pair */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #141414 #E4E3E0;
+}
+
