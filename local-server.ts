@@ -1,4 +1,4 @@
-import app from "./server.ts";
+import app from "./server.js";
 import path from "path";
 import express from "express";
 
