@@ -64,12 +64,36 @@ interface AddressState {
 
 const addressStates = new Map<string, AddressState>();
 
-const getOrCreateStateForAddress = (addressStr: string) => {
+const getOrCreateStateForAddress = (addressStr: string, balanceUSD?: number) => {
   const normAddress = (addressStr || "").toLowerCase().trim();
   const lookupAddress = normAddress || "0x0000000000000000000000000000000000000000";
 
   if (addressStates.has(lookupAddress)) {
-    return addressStates.get(lookupAddress)!;
+    const existingState = addressStates.get(lookupAddress)!;
+    // If a custom real wallet balance is supplied, dynamically adjust the existing positions to match it
+    if (balanceUSD !== undefined && balanceUSD > 0) {
+      const targetBase = Number(balanceUSD);
+      const val1 = Math.floor(targetBase * 0.55);
+      const val2 = Math.floor(targetBase * 0.30);
+      const val3 = targetBase - (val1 + val2);
+
+      if (existingState.positions.length >= 3) {
+        existingState.positions[0].value = val1;
+        existingState.positions[1].value = val2;
+        existingState.positions[2].value = val3;
+      }
+      
+      existingState.chartPoints = [
+        { date: "Mon", value: Math.floor(targetBase * 0.98) },
+        { date: "Tue", value: Math.floor(targetBase * 0.99) },
+        { date: "Wed", value: Math.floor(targetBase * 0.985), actionMarker: { type: "REBALANCE" as const, label: `Uniswap Rebalance ($${Math.floor(targetBase * 0.01)})` } },
+        { date: "Thu", value: Math.floor(targetBase * 0.995) },
+        { date: "Fri", value: Math.floor(targetBase * 1.0) },
+        { date: "Sat", value: Math.floor(targetBase * 0.992), actionMarker: { type: "REBALANCE" as const, label: `Aave Optimization ($${Math.floor(targetBase * 0.005)})` } },
+        { date: "Sun", value: targetBase },
+      ];
+    }
+    return existingState;
   }
 
   // Generate deterministic randomized characteristics based on address string
@@ -80,8 +104,11 @@ const getOrCreateStateForAddress = (addressStr: string) => {
   }
   hashVal = Math.abs(hashVal);
 
-  // Deterministic realistic portfolio value between $20,000 and $100,000
-  const portfolioBase = 20000 + (hashVal % 80000);
+  // Use the real wallet balance if provided and non-zero, otherwise fall back to deterministic simulated portfolio value
+  let portfolioBase = 20000 + (hashVal % 80000);
+  if (balanceUSD !== undefined && balanceUSD > 0) {
+    portfolioBase = balanceUSD;
+  }
 
   // Divide portfolio value
   const val1 = Math.floor(portfolioBase * 0.55);
@@ -227,7 +254,8 @@ app.use(express.json());
 
   app.get("/api/agent-state", (req, res) => {
     const address = (req.query.address as string) || "0x0000000000000000000000000000000000000000";
-    const state = getOrCreateStateForAddress(address);
+    const balanceUSD = req.query.balanceUSD ? Number(req.query.balanceUSD) : undefined;
+    const state = getOrCreateStateForAddress(address, balanceUSD);
     res.json({
       vaultDeployed: state.vaultDeployed,
       vaultAddress: state.vaultAddress,

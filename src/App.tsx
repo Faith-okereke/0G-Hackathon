@@ -191,17 +191,39 @@ export default function App() {
   }, [walletAddress, fetchMetaMaskBalanceOnly]);
 
   // Connect helper
-  const handleConnectWallet = (address: string) => {
+  const handleConnectWallet = async (address: string) => {
     setWalletAddress(address);
     localStorage.setItem('aegis_zero_wallet_address', address);
-    triggerToast('success', 'Hardware wallet connected via cryptographically proof.');
     
-    // Fetch live balance from provider
-    fetchMetaMaskBalanceOnly(address);
-
-    // Fetch state for this specific address
     setIsLoading(true);
-    fetch(`/api/agent-state?address=${encodeURIComponent(address)}`)
+    let balanceUSDVal: number | undefined = undefined;
+
+    // Fetch live balance from provider first
+    if (typeof window !== 'undefined' && (window as any).ethereum) {
+      try {
+        const provider = (window as any).ethereum;
+        const balanceHex = await provider.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        });
+        const wei = BigInt(balanceHex);
+        const ethVal = Number(wei) / 1e18;
+        setEthBalance(ethVal.toFixed(4));
+        const estimatedUSD = Math.round(ethVal * 3120);
+        setEthBalanceUSD(estimatedUSD);
+        if (estimatedUSD > 0) {
+          balanceUSDVal = estimatedUSD;
+        }
+      } catch (err) {
+        console.error("Error fetching live balance during connection:", err);
+      }
+    }
+
+    triggerToast('success', 'Hardware wallet connected via cryptographic proof.');
+
+    // Fetch state for this specific address with the live portfolio balance synced
+    const balanceQuery = balanceUSDVal !== undefined ? `&balanceUSD=${balanceUSDVal}` : '';
+    fetch(`/api/agent-state?address=${encodeURIComponent(address)}${balanceQuery}`)
       .then((res) => res.json())
       .then((data) => {
         setVaultDeployed(data.vaultDeployed);
