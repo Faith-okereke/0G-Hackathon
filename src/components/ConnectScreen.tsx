@@ -97,7 +97,7 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
             </div>
             <span className="font-serif italic text-sm font-semibold tracking-tight text-[#141414]">Ægis Zero Link</span>
           </div>
-          <span className="text-[9px] font-mono bg-[#141414] text-white px-2 py-0.5 tracking-wider uppercase">V1.0.0</span>
+          <span className="text-[9px] font-mono bg-[#141414] text-[#ffffff] px-2 py-0.5 tracking-wider uppercase">V1.0.0</span>
         </div>
 
         <div className="p-6">
@@ -156,15 +156,15 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
       {/* Interactive Wallet Selection & Custom Address Paste Modal */}
       <AnimatePresence>
         {showWalletModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#141414]/50 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-[#141414]/30 backdrop-blur-md">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#D9D8D5] border-2 border-[#141414] max-w-md w-full shadow-none overflow-hidden"
+              className="bg-white/40 backdrop-blur-xl border-2 border-[#141414] max-w-md w-full shadow-[8px_8px_0px_0px_#141414] overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="px-5 py-3 border-b-2 border-[#141414] bg-[#EEECE8] flex items-center justify-between">
+              <div className="px-5 py-3.5 border-b-2 border-[#141414] bg-[#EEECE8]/50 backdrop-blur-md flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#141414]">Select Web3 Wallet Provider</span>
                 <button 
                   onClick={() => {

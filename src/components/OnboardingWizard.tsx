@@ -3,6 +3,7 @@ import { ShieldCheck, ArrowRight, Settings, Server, Check, Loader2, Coins } from
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OnboardingWizardProps {
+  walletAddress: string;
   onComplete: (data: {
     perTxMax: number;
     dailyCap: number;
@@ -13,7 +14,7 @@ interface OnboardingWizardProps {
   toast: (type: 'success' | 'error' | 'info', msg: string) => void;
 }
 
-export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete, toast }) => {
+export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ walletAddress, onComplete, toast }) => {
   const [step, setStep] = useState(1);
   
   // State for limits (Step 1)
@@ -69,6 +70,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete, 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                address: walletAddress,
                 perTxMax,
                 dailyCap,
                 coSignThreshold,

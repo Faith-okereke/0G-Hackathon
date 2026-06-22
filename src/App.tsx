@@ -55,7 +55,8 @@ export default function App() {
   const fetchState = async (silent = false) => {
     if (!silent) setIsLoading(true);
     try {
-      const res = await fetch('/api/agent-state');
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
+      const res = await fetch(`/api/agent-state?address=${encodeURIComponent(address)}`);
       const data = await res.json();
       setVaultDeployed(data.vaultDeployed);
       setVaultAddress(data.vaultAddress);
@@ -114,6 +115,28 @@ export default function App() {
     setWalletAddress(address);
     localStorage.setItem('aegis_zero_wallet_address', address);
     triggerToast('success', 'Hardware wallet connected via cryptographically proof.');
+    
+    // Fetch state for this specific address
+    setIsLoading(true);
+    fetch(`/api/agent-state?address=${encodeURIComponent(address)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setVaultDeployed(data.vaultDeployed);
+        setVaultAddress(data.vaultAddress);
+        setActiveAgentKey(data.activeAgentKey);
+        setIsPaused(data.isPaused);
+        setLimits(data.limits);
+        setWhitelistedProtocols(data.whitelistedProtocols);
+        setPositions(data.positions);
+        setDecisionLogs(data.decisionLogs);
+        setChartPoints(data.chartPoints);
+      })
+      .catch(() => {
+        triggerToast('error', 'Error syncing state with 0G network.');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleDisconnectWallet = () => {
@@ -135,10 +158,11 @@ export default function App() {
   // Pause toggle
   const handlePauseToggle = async (paused: boolean) => {
     try {
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
       const res = await fetch('/api/emergency-pause', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paused }),
+        body: JSON.stringify({ address, paused }),
       });
       const data = await res.json();
       if (data.success) {
@@ -158,10 +182,11 @@ export default function App() {
   // Modify limits
   const handleUpdateLimits = async (newLimits: VaultLimits) => {
     try {
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
       const res = await fetch('/api/update-limits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newLimits),
+        body: JSON.stringify({ address, ...newLimits }),
       });
       const data = await res.json();
       if (data.success) {
@@ -176,10 +201,11 @@ export default function App() {
   // Modify Protocols
   const handleUpdateProtocols = async (pList: string[]) => {
     try {
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
       const res = await fetch('/api/update-protocols', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ protocols: pList }),
+        body: JSON.stringify({ address, protocols: pList }),
       });
       const data = await res.json();
       if (data.success) {
@@ -194,7 +220,12 @@ export default function App() {
   // Key rotation
   const handleRotateKey = async () => {
     try {
-      const res = await fetch('/api/rotate-key', { method: 'POST' });
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
+      const res = await fetch('/api/rotate-key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
       const data = await res.json();
       if (data.success) {
         setActiveAgentKey(data.activeAgentKey);
@@ -208,7 +239,12 @@ export default function App() {
   // Empty funds simulation
   const handleWithdrawFunds = async () => {
     try {
-      const res = await fetch('/api/withdraw', { method: 'POST' });
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
+      const res = await fetch('/api/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
       const data = await res.json();
       if (data.success) {
         setPositions(data.positions);
@@ -221,10 +257,11 @@ export default function App() {
 
   const handleAddmockFunds = async (amount: number) => {
     try {
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
       const res = await fetch('/api/add-funds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ address, amount }),
       });
       const data = await res.json();
       if (data.success) {
@@ -247,7 +284,8 @@ export default function App() {
     triggerToast('info', '0G Compute requesting LLM volatility analysis...');
 
     try {
-      const res = await fetch('/api/run-cycle', { method: 'POST' });
+      const address = localStorage.getItem('aegis_zero_wallet_address') || localStorage.getItem('defai_wallet_address') || '';
+      const res = await fetch(`/api/run-cycle?address=${encodeURIComponent(address)}`, { method: 'POST' });
       const data = await res.json();
       if (data.success) {
         setPositions(data.positions);
@@ -298,7 +336,7 @@ export default function App() {
   if (walletAddress && !vaultDeployed) {
     return (
       <>
-        <OnboardingWizard onComplete={handleOnboardingComplete} toast={triggerToast} />
+        <OnboardingWizard walletAddress={walletAddress} onComplete={handleOnboardingComplete} toast={triggerToast} />
         <ToastContainer toasts={toasts} onClose={handleCloseToast} />
       </>
     );
