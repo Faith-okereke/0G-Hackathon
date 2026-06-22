@@ -31,6 +31,11 @@ export default function App() {
   const [decisionLogs, setDecisionLogs] = useState<DecisionLog[]>([]);
   const [chartPoints, setChartPoints] = useState<PerformancePoint[]>([]);
 
+  // Connected Wallet Live States
+  const [ethBalance, setEthBalance] = useState<string | null>(null);
+  const [ethBalanceUSD, setEthBalanceUSD] = useState<number | null>(null);
+  const [isSyncingWallet, setIsSyncingWallet] = useState<boolean>(false);
+
   // Interactive UI states
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isTriggeringCycle, setIsTriggeringCycle] = useState(false);
@@ -111,12 +116,89 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentTab, isPaused]);
 
+  // Fetch MetaMask balance from the active provider
+  const fetchMetaMaskBalanceOnly = useCallback(async (address: string) => {
+    if (typeof window !== 'undefined' && (window as any).ethereum) {
+      try {
+        const provider = (window as any).ethereum;
+        const balanceHex = await provider.request({
+          method: 'eth_getBalance',
+          params: [address, 'latest'],
+        });
+        const wei = BigInt(balanceHex);
+        const ethVal = Number(wei) / 1e18;
+        setEthBalance(ethVal.toFixed(4));
+        // Using average representative ETH/USD price ($3,120) to convert balance to fiat USD
+        setEthBalanceUSD(ethVal * 3120);
+      } catch (err) {
+        console.error("Error fetching live MetaMask balance:", err);
+      }
+    }
+  }, []);
+
+  // Sync simulated vault value with live physical wallet balance
+  const handleSyncWalletBalance = async () => {
+    if (!walletAddress) {
+      triggerToast('error', 'Please connect your active Ethereum wallet first.');
+      return;
+    }
+    setIsSyncingWallet(true);
+    try {
+      if (typeof window !== 'undefined' && (window as any).ethereum) {
+        const provider = (window as any).ethereum;
+        const balanceHex = await provider.request({
+          method: 'eth_getBalance',
+          params: [walletAddress, 'latest'],
+        });
+        const wei = BigInt(balanceHex);
+        const ethVal = Number(wei) / 1e18;
+        setEthBalance(ethVal.toFixed(4));
+        
+        const ethPrice = 3120;
+        const valUSD = Math.round(ethVal * ethPrice);
+        setEthBalanceUSD(valUSD);
+
+        const res = await fetch('/api/sync-wallet-balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: walletAddress, balanceUSD: valUSD }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setPositions(data.positions);
+          setChartPoints(data.chartPoints);
+          triggerToast('success', `Integrated actual MetaMask balance of ${ethVal.toFixed(4)} ETH ($${valUSD.toLocaleString()} USD) into your Smart Vault!`);
+        }
+      } else {
+        triggerToast('error', 'MetaMask is not available in this window context.');
+      }
+    } catch (err) {
+      console.error("MetaMask live balance sync failed", err);
+      triggerToast('error', 'MetaMask connection timed out or was rejected.');
+    } finally {
+      setIsSyncingWallet(false);
+    }
+  };
+
+  // Fetch balance automatically on address load
+  useEffect(() => {
+    if (walletAddress) {
+      fetchMetaMaskBalanceOnly(walletAddress);
+    } else {
+      setEthBalance(null);
+      setEthBalanceUSD(null);
+    }
+  }, [walletAddress, fetchMetaMaskBalanceOnly]);
+
   // Connect helper
   const handleConnectWallet = (address: string) => {
     setWalletAddress(address);
     localStorage.setItem('aegis_zero_wallet_address', address);
     triggerToast('success', 'Hardware wallet connected via cryptographically proof.');
     
+    // Fetch live balance from provider
+    fetchMetaMaskBalanceOnly(address);
+
     // Fetch state for this specific address
     setIsLoading(true);
     fetch(`/api/agent-state?address=${encodeURIComponent(address)}`)
@@ -143,6 +225,8 @@ export default function App() {
 
   const handleDisconnectWallet = () => {
     setWalletAddress(null);
+    setEthBalance(null);
+    setEthBalanceUSD(null);
     localStorage.removeItem('aegis_zero_wallet_address');
     localStorage.removeItem('defai_wallet_address');
     triggerToast('info', 'Wallet session terminated safely.');
@@ -414,11 +498,34 @@ export default function App() {
 
           {/* Connected Address info block */}
           <div className="flex items-center gap-2">
-            <div className="font-mono text-[11px] sm:text-xs text-slate-400 px-2 sm:px-2.5 py-1 bg-surface border border-border rounded flex items-center gap-1.5">
-              <Wallet className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue flex-shrink-0" />
-              <span className="sm:hidden">{walletAddress.length > 13 ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : walletAddress}</span>
-              <span className="hidden sm:inline">{walletAddress}</span>
+            <div className="font-mono text-[11px] sm:text-xs text-slate-400 px-2.5 py-1 bg-surface border border-border rounded flex items-center gap-2">
+              <Wallet className="w-3.5 h-3.5 text-green-400 flex-shrink-0" />
+              <div className="flex flex-col text-left">
+                <span className="sm:hidden text-slate-300 font-semibold">{walletAddress.length > 13 ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : walletAddress}</span>
+                <span className="hidden sm:inline text-slate-300 font-semibold">{walletAddress}</span>
+                {ethBalance !== null ? (
+                  <span className="text-[9px] text-green-400 font-bold tracking-wide uppercase">
+                    MetaMask Balance: {ethBalance} ETH (${Math.round(ethBalanceUSD || 0).toLocaleString()} USD)
+                  </span>
+                ) : (
+                  <span className="text-[9px] text-amber-500 font-bold tracking-wide uppercase animate-pulse">
+                    Retrieving Balance...
+                  </span>
+                )}
+              </div>
             </div>
+
+            <button
+               onClick={handleSyncWalletBalance}
+               className={`px-2.5 py-1 rounded bg-[#141414] hover:bg-[#2e2e2e] border border-border text-[9px] font-bold uppercase tracking-wider text-green-400 transition-all flex items-center gap-1 ${
+                 isSyncingWallet ? 'animate-pulse' : ''
+               }`}
+               title="Sync Smart Vault with MetaMask Balance"
+               disabled={isSyncingWallet}
+            >
+              <RefreshCw className={`w-3 h-3 ${isSyncingWallet ? 'animate-spin' : ''}`} />
+              Sync Base
+            </button>
 
             <button
               onClick={handleDisconnectWallet}
@@ -475,6 +582,10 @@ export default function App() {
                   onNavigateToSettings={() => setCurrentTab('settings')}
                   onAddFunds={handleAddmockFunds}
                   isTriggeringCycle={isTriggeringCycle}
+                  ethBalance={ethBalance}
+                  ethBalanceUSD={ethBalanceUSD}
+                  onSyncWalletBalance={handleSyncWalletBalance}
+                  isSyncingWallet={isSyncingWallet}
                 />
               </motion.div>
             )}

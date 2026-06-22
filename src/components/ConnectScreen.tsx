@@ -219,15 +219,15 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
                 )}
 
                 {isConnecting && !errorMessage && (
-                  <div className="p-3 bg-amber-50 border border-amber-500 text-amber-800 text-xs font-mono space-y-2">
+                  <div className="p-3 bg-amber-50 border border-amber-500 text-[#000000] text-xs font-mono space-y-2">
                     <div className="font-bold flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                       <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                       Connecting Web3 Provider...
                     </div>
-                    <p className="text-[10px] text-amber-800/80 leading-relaxed">
+                    <p className="text-[10px] leading-relaxed">
                       If MetaMask didn't pop up immediately, a connection prompt may be minimized in your browser. Complete the signing or click the MetaMask icon on the extension bar.
                     </p>
-                    <p className="text-[10px] font-semibold border-t border-amber-500/20 pt-2 text-amber-950">
+                    <p className="text-[10px] font-semibold border-t border-amber-500/20 pt-2 ">
                       💡 Sandbox Environment Note: Since this app is in an iframe, MetaMask extension communication may be blocked by your browser. Open the application in a new separate tab or utilize the Simulated ledger wallet below!
                     </p>
                   </div>

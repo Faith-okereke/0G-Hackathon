@@ -326,6 +326,75 @@ app.use(express.json());
     res.json({ success: true, positions: state.positions });
   });
 
+  app.post("/api/sync-wallet-balance", (req, res) => {
+    const { address, balanceUSD } = req.body;
+    const state = getOrCreateStateForAddress(address);
+    
+    const targetBase = Number(balanceUSD);
+    const val1 = Math.floor(targetBase * 0.55);
+    const val2 = Math.floor(targetBase * 0.30);
+    const val3 = targetBase - (val1 + val2);
+
+    if (state.positions.length >= 3) {
+      state.positions[0].value = val1;
+      state.positions[1].value = val2;
+      state.positions[2].value = val3;
+    } else {
+      // In case positions list was somehow truncated
+      state.positions = [
+        {
+          id: "pos_1",
+          protocol: "Uniswap v3" as const,
+          pool: "USDC / ETH (0.05%)",
+          value: val1,
+          targetRange: "2,850 - 3,150 USD/ETH",
+          drift: 1.5,
+          lastRebalance: "Just now",
+          status: "green" as const,
+          tokenA: "USDC",
+          tokenB: "ETH",
+        },
+        {
+          id: "pos_2",
+          protocol: "Aave v3" as const,
+          pool: "USDC Supply Vault",
+          value: val2,
+          targetRange: "> 4.5% APY",
+          drift: 0.8,
+          lastRebalance: "Just now",
+          status: "green" as const,
+          tokenA: "USDC",
+          tokenB: "aUSDC",
+        },
+        {
+          id: "pos_3",
+          protocol: "Curve" as const,
+          pool: "3pool (DAI/USDC/USDT)",
+          value: val3,
+          targetRange: "Stable Balance Ratio",
+          drift: 2.1,
+          lastRebalance: "Just now",
+          status: "green" as const,
+          tokenA: "3CRV",
+          tokenB: "USDC",
+        }
+      ];
+    }
+
+    // Regulate chartPoints so history also scales perfectly
+    state.chartPoints = [
+      { date: "Mon", value: Math.floor(targetBase * 0.98) },
+      { date: "Tue", value: Math.floor(targetBase * 0.99) },
+      { date: "Wed", value: Math.floor(targetBase * 0.985), actionMarker: { type: "REBALANCE" as const, label: `Uniswap Rebalance ($${Math.floor(targetBase * 0.01)})` } },
+      { date: "Thu", value: Math.floor(targetBase * 0.995) },
+      { date: "Fri", value: Math.floor(targetBase * 1.0) },
+      { date: "Sat", value: Math.floor(targetBase * 0.992), actionMarker: { type: "REBALANCE" as const, label: `Aave Optimization ($${Math.floor(targetBase * 0.005)})` } },
+      { date: "Sun", value: targetBase },
+    ];
+
+    res.json({ success: true, positions: state.positions, chartPoints: state.chartPoints });
+  });
+
   app.post("/api/withdraw", (req, res) => {
     const { address } = req.body;
     const state = getOrCreateStateForAddress(address);
