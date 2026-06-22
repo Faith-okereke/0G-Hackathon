@@ -37,21 +37,55 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
     // Check if MetaMask is available in the current browser context (even inside an iframe)
     const provider = (window as any).ethereum;
     if (provider) {
+      let timeoutId: any;
+      let settled = false;
+
+      // Define a realistic timeout to prevent infinite loading state if MetaMask hangs
+      const connectionTimeout = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          if (!settled) {
+            reject(new Error("CONNECTION_TIMEOUT"));
+          }
+        }, 12000); // 12 seconds
+      });
+
       try {
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        const fetchAccounts = provider.request({ method: 'eth_requestAccounts' });
+        // Race the request against our timeout
+        const accounts = await Promise.race([fetchAccounts, connectionTimeout]) as string[];
+        settled = true;
+        clearTimeout(timeoutId);
+
         if (accounts && accounts[0]) {
           onConnect(accounts[0]);
           setIsConnecting(false);
           setShowWalletModal(false);
           return;
+        } else {
+          setErrorMessage("No active accounts returned from your wallet. Make sure MetaMask is unlocked.");
         }
       } catch (err: any) {
+        settled = true;
+        clearTimeout(timeoutId);
         console.error("MetaMask connection failed", err);
-        setErrorMessage(err.message || "MetaMask connection was rejected or failed inside the secure sandbox.");
+
+        if (err.message === "CONNECTION_TIMEOUT") {
+          setErrorMessage(
+            "Connection request timed out. MetaMask may be blocking cross-origin requests inside the preview frame, or there is already a minimized connection window. Please click the MetaMask extension in your browser, or open this app in a separate browser tab using the option at the top right."
+          );
+        } else if (err.code === -32002) {
+          setErrorMessage(
+            "MetaMask connection is already pending! Click on the MetaMask extension icon in your browser's toolbar toolbar to approve it."
+          );
+        } else if (err.code === 4001) {
+          setErrorMessage("User rejected the connection request in MetaMask.");
+        } else {
+          setErrorMessage(err.message || "MetaMask connection was rejected or failed inside the secure sandbox.");
+        }
       }
     } else {
       // In sandbox/iframe environment, standard extension might not bind
-      setErrorMessage("MetaMask is not injected in this frame. Please paste your address manually or use simulated account.");
+      setErrorMessage("No Ethereum wallet found! If you have MetaMask installed, please try opening this application in a separate tab, or paste any custom EVM address below to simulate your dashboard.");
     }
     setIsConnecting(false);
   };
@@ -181,6 +215,21 @@ export const ConnectScreen: React.FC<ConnectScreenProps> = ({ onConnect }) => {
                 {errorMessage && (
                   <div className="p-3 bg-red-100 border border-red-500 text-red-700 text-xs font-mono">
                     {errorMessage}
+                  </div>
+                )}
+
+                {isConnecting && !errorMessage && (
+                  <div className="p-3 bg-amber-50 border border-amber-500 text-amber-800 text-xs font-mono space-y-2">
+                    <div className="font-bold flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      Connecting Web3 Provider...
+                    </div>
+                    <p className="text-[10px] text-amber-800/80 leading-relaxed">
+                      If MetaMask didn't pop up immediately, a connection prompt may be minimized in your browser. Complete the signing or click the MetaMask icon on the extension bar.
+                    </p>
+                    <p className="text-[10px] font-semibold border-t border-amber-500/20 pt-2 text-amber-950">
+                      💡 Sandbox Environment Note: Since this app is in an iframe, MetaMask extension communication may be blocked by your browser. Open the application in a new separate tab or utilize the Simulated ledger wallet below!
+                    </p>
                   </div>
                 )}
 
