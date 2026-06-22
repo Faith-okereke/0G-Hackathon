@@ -1,6 +1,6 @@
 {
   "name": "Aegis Zero",
-  "description": "Autonomous, Verifiable, and User-Owned DeFi Portfolio Management built on 0G (Zero Gravity).",
+  "description": "A smart, automated wealth assistant that dynamically manages and protects your funds using secure, intelligent algorithms while keeping you in full ownership.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
