@@ -68,6 +68,7 @@ export default function App() {
       setDecisionLogs(data.decisionLogs);
       setChartPoints(data.chartPoints);
     } catch (e) {
+      console.error("Error syncing state with backend:", e);
       triggerToast('error', 'Error syncing state with 0G network.');
     } finally {
       setIsLoading(false);
@@ -131,7 +132,8 @@ export default function App() {
         setDecisionLogs(data.decisionLogs);
         setChartPoints(data.chartPoints);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Error connecting and fetching state:", err);
         triggerToast('error', 'Error syncing state with 0G network.');
       })
       .finally(() => {
